@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics</title>
+  <link rel="stylesheet" href="{{url_for('static', filename='css/styles.css')}}">
+</head>
+<body class="body-color">
+
+   <!-- HEADER SECTION -->
+<header class="hero-dash">
+  <div class="logo-dash">
+    <a href="{{url_for ('index') }}">
+      <img src="../static/images/Photoroom-20241204_211017~2.png" alt="FinanceTracker Logo">
+    </a>
+  </div>
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <ul class="nav-links">
+      <li><a href="{{url_for ('index') }}">Home</a></li>
+      <li><a href="{{url_for ('dashboard') }}">Dashboard</a></li>
+      <li><a href="{{url_for ('analytics') }}">Analytics</a></li>
+      <li><a href="{{url_for ('addtransaction') }}">Add Transaction</a></li>
+      <li><a href="{{url_for ('viewtransaction') }}">View Transaction</a></li>
+      <li><a href="{{url_for ('profile') }}">Profile</a></li>
+    </ul>
+  </nav>
+</header>
+
+<!-- Analytics & Reports Section -->
+<div class="container-analys">
+  <!-- Header -->
+  <header class="text-center-my-4">
+    <h1>Analytics & Reports</h1>
+  </header>
+
+  <!-- Summary Section -->
+  <section class="summary">
+    <div class="summary-card">
+      <h3>Total Income</h3>
+      <p id="total-income">$0.00</p>
+    </div>
+    <div class="summary-card">
+      <h3>Total Expenses</h3>
+      <p id="total-expenses">$0.00</p>
+    </div>
+    <div class="summary-card">
+      <h3>Savings</h3>
+      <p id="savings">$0.00</p>
+    </div>
+  </section>
+
+  <!-- Charts Section -->
+  <section class="charts">
+    <div class="chart-container">
+      <h3>Expenses by Category</h3>
+      <canvas id="category-chart"></canvas>
+    </div>
+    <div class="chart-container">
+      <h3>Spending Trends</h3>
+      <canvas id="trend-chart"></canvas>
+    </div>
+  </section>
+</div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{{url_for('static', filename='js/scripts.js')}}"></script>
+</body>
+</html>

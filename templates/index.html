@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finance Tracker - Welcome</title>
+  <link rel="stylesheet" href="{{url_for ('static', filename='css/styles.css') }}">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+  
+  <!-- HERO SECTION -->
+  <header class="hero">
+    <div class="logo">
+    <a href="{{url_for ('index') }}"><img src="../static/images/Photoroom-20241204_211017~2.png" alt="FinanceTracker Logo"></a> 
+   </div>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="{{url_for ('profile') }}">Profile</a></li>
+      </ul>
+    </nav>
+
+     <!-- welcoming section -->
+    <h1>Welcome to FinanceTracker</h1>
+    <p>Your ultimate solution for managing income, expenses, and budgets effortlessly.</p>
+    <a href="{{url_for ('register') }}" class="cta">Get Started</a>
+  </header>  
+
+  <!-- ABOUT SECTION -->
+  <section id="about">
+    <h2>About FinanceTracker</h2>
+    <p>FinanceTracker is a powerful application designed to help you track your financial transactions, create budgets, and analyze spending patterns. <br> Whether you're managing personal or business finances, FinanceTracker makes it simple, organized, and secure.</p>
+  </section>
+
+  <!-- FEATURES SECTION -->
+  <section id="features">
+    <h2>Features</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <img src="../static/images/Page 3 _ Investment Vectors & Illustrations for Free Download _ Freepik.jpeg" alt="">
+        <h3>Transaction Tracking</h3>
+        <p>Easily log income and expenses with detailed categories and real-time updates.</p>
+      </div>
+      <div class="feature-card">
+        <img src="../static/images/𝟔_ 𝐓𝐚𝐥𝐥𝐲 𝐰𝐢𝐭𝐡 𝐆𝐒𝐓 𝐏𝐫𝐨𝐟𝐢𝐜𝐢𝐞𝐧𝐜𝐲.jpeg" alt="">
+        <h3>Budgeting</h3>
+        <p>Create monthly or yearly budgets and stay on top of your financial goals.</p>
+      </div>
+      <div class="feature-card">
+        <img src="../static/images/Открытая папка, Папка с документами, Концепция защиты документов _ Премиум векторы.jpeg" alt="">
+        <h3>Detailed Reports</h3>
+        <p>Get insights into your spending habits with graphs and detailed reports.</p>
+      </div>
+      <div class="feature-card">
+        <img src="../static/images/Data_security_28.jpg" alt="">
+        <h3>Secure Data</h3>
+        <p>All your financial information is stored securely and encrypted.</p>
+      </div>
+    </div>
+  </section>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-content">
+      <!-- Social Media Links Section -->
+      <div class="social-media">
+        <a href="#" class="social-icon"><i class="fab fa-facebook"></i> Facebook</a>
+        <a href="#" class="social-icon"><i class="fab fa-twitter"></i> Twitter</a>
+        <a href="#" class="social-icon"><i class="fab fa-instagram"></i> Instagram</a>
+        <a href="#" class="social-icon"><i class="fab fa-linkedin"></i> LinkedIn</a>
+      </div>
+
+      <!-- Footer Links Section -->
+      <div class="footer-links">
+        <a href="#privacy-policy" class="footer-link">Privacy Policy</a>
+        <a href="#terms" class="footer-link">Terms & Conditions</a>
+        <a href="#faq" class="footer-link">FAQ</a>
+      </div>
+
+      <!-- Copyright Section -->
+      <div class="copyright">
+        <p>&copy; 2024 FinanceTracker. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
