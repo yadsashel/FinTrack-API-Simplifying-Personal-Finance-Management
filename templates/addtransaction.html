@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Add Transaction</title>
   <link rel="stylesheet" href="{{url_for('static', filename='css/styles.css')}}">
-<body class="body-color">
+<body>
 
    <!-- HEADER SECTION -->
    <header class="hero-dash">
@@ -16,7 +16,6 @@
     <nav class="navbar">
       <ul class="nav-links">
         <li><a href="{{url_for ('index') }}">Home</a></li>
-        <li><a href="{{url_for ('dashboard') }}">Dashboard</a></li>
         <li><a href="{{url_for ('analytics') }}">Analytics</a></li>
         <li><a href="{{url_for ('addtransaction') }}">Add Transaction</a></li>
         <li><a href="{{url_for ('viewtransaction') }}">View Transaction</a></li>
@@ -24,10 +23,11 @@
       </ul>
     </nav>
 
+    <!-- add transaction -->
   <div class="container-add">
     <!-- Form Section -->
      <h1>Add Trannsaction</h1>
-    <form action="#" method="POST" class="transaction-form">
+    <form action="/addtransaction" method="POST" class="transaction-form">
       <div class="form-add">
         <label for="transaction-date">Date:</label>
         <input type="date" id="transaction-date" name="transaction-date" required>
@@ -54,6 +54,20 @@
       </div>
     </form>
   </div>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="alert {{ category }}">
+              <button class="close" onclick="this.parentElement.style.display='none';">&times;</button>
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
 
   <script src="{{url_for('static', filename='js/scripts.js')}}"></script>
 </body>

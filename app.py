@@ -1,20 +1,21 @@
 import os
 import sys
-from flask import Flask, sessions, render_template, signals, redirect, url_for, Response, flash, jsonify, request
+from flask import Flask, session, render_template, signals, redirect, url_for, Response, flash, jsonify, request, json
 from werkzeug.security import generate_password_hash, check_password_hash
 from pymongo.mongo_client import MongoClient #remember in here you imported that for fixing the problem of database error
 from pymongo.server_api import ServerApi #also this
 from dotenv import load_dotenv
+from flask_pymongo import PyMongo
 import bcrypt
-from bson import ObjectId 
+from bson.objectid import ObjectId  # For working with MongoDB ObjectId
 from flask_cors import CORS 
+from datetime import datetime, timedelta
 
 #creating the flask app
 app = Flask(__name__)
 CORS(app)
 
-#seeting up a secret key for securing session
-app.secret_key = '#Fp23@/3mOk'
+app.secret_key = '#Fp23@/3jmOk' #seeting up a secret key for securing session
 
 # Load environment variables from .env
 load_dotenv()
@@ -32,11 +33,12 @@ db = client["fintrack_db"]
 
 # Access the 'users' collection within 'fintrack_db'
 users_collection = db["users"]
+transactions_collection = db["transaction"]
 
 # Send a ping to confirm a successful connection
 try:
     client.admin.command('ping')
-    print("Pinged your deployment. You successfully connected to MongoDB!")
+    print("Pinged your deployment. You successfully connected to MongoDB!") 
 except Exception as e:
     print(e)
 
@@ -45,36 +47,203 @@ except Exception as e:
 def index():
     return render_template('index.html')
 
-#route for the dashboard 
-@app.route('/dashboard')
-def dashboard():
-    return render_template('dashboard.html')
-
 #route for add transaction 
-@app.route('/addtransaction')
+@app.route('/addtransaction', methods=['GET', 'POST'])
 def addtransaction():
+    if request.method == 'POST':
+        try:
+            
+            #extract the data from the form
+            date = datetime.strptime(request.form['transaction-date'], '%Y-%m-%d')
+            type_ = request.form['transaction-type']
+            category = request.form['transaction-category']
+            amount = float(request.form['transaction-amount'])
+
+            # Insert into MongoDB
+            transaction = {
+                "date": date,
+                "type": type_,
+                "category": category,
+                "amount": amount
+            }
+            transactions_collection.insert_one(transaction)
+
+            flash('Transaction added successfully!', 'success')
+            return redirect('/addtransaction')
+
+        except Exception as e:
+            flash(f'An error occurred: {e}', 'error')
+            return redirect('/addtransaction')
+
     return render_template('addtransaction.html')
 
-#route for view transaction
-@app.route('/viewtransaction')
+# Route for view transaction page
+@app.route('/viewtransaction', methods=['GET', 'POST'])
 def viewtransaction():
-    return render_template('viewtransaction.html')
+    if request.method == 'POST':
+        action = request.json.get('action')
+        transaction_id = request.json.get('id')
 
-#route for profile
-@app.route('/profile')
+        if action == 'delete':
+            transactions_collection.delete_one({"_id": ObjectId(transaction_id)})
+            return jsonify({"message": "Transaction deleted successfully"}), 200
+
+        elif action == 'edit':
+            updated_data = request.json.get('updatedData')
+            transactions_collection.update_one(
+                {"_id": ObjectId(transaction_id)},
+                {"$set": updated_data}
+            )
+            return jsonify({"message": "Transaction updated successfully"}), 200
+
+        return jsonify({"message": "Invalid action"}), 400
+
+    # Fetch transactions and ensure `date` is a datetime object
+    transactions = list(transactions_collection.find())
+    for transaction in transactions:
+        transaction["_id"] = str(transaction["_id"])
+        if "date" in transaction:
+            if isinstance(transaction["date"], str):
+                try:
+                    # Convert string date to datetime object if it's a valid date string
+                    transaction["date"] = datetime.strptime(transaction["date"], "%Y-%m-%d")
+                except ValueError:
+                    # If the date string is invalid, set it to None
+                    transaction["date"] = None
+            elif not isinstance(transaction["date"], datetime):
+                transaction["date"] = None  # Handle cases where date is not a datetime object
+
+    return render_template('viewtransaction.html', transactions=transactions)
+
+
+#route for delete button
+@app.route('/delete-transaction/<transaction_id>', methods=['DELETE'])
+def delete_transaction(transaction_id):
+    transactions_collection.delete_one({"_id": ObjectId(transaction_id)})
+    return jsonify({"success": True, "message": "Transaction deleted successfully."})
+
+
+# Route for profile
+@app.route('/profile', methods=['GET', 'POST'])
 def profile():
-    return render_template('profile.html')
+    # Check if the user is logged in
+    if 'user_id' not in session:
+        flash('Please log in to access your profile', 'error')
+        return redirect(url_for('login'))
+    
+    try:
+        user_id = ObjectId(session['user_id'])  # Convert string to ObjectId
+    except Exception:
+        flash('Invalid user ID', 'error')
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        # Get form data
+        full_name = request.form.get('full_name')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        address = request.form.get('address')
+        phone = request.form.get('phone')
+        
+        # Validate password match
+        if password and password != confirm_password:
+            flash('Passwords do not match', 'error')
+            return redirect(url_for('profile'))
+
+        # Prepare update data (exclude empty fields)
+        update_data = {}
+        if full_name: update_data['full_name'] = full_name
+        if email: update_data['email'] = email
+        if address: update_data['address'] = address
+        if phone: update_data['phone'] = phone
+        if password: 
+            update_data['password'] = generate_password_hash(password)
+
+        # Update the user in the database
+        try:
+            result = users_collection.update_one({'_id': user_id}, {'$set': update_data})
+            if result.matched_count == 0:
+                flash('User not found during update', 'error')
+            else:
+                flash('Profile updated successfully', 'success')
+        except Exception:
+            flash('An error occurred while updating your profile', 'error')
+
+        return redirect(url_for('profile'))
+
+    # For GET requests, fetch user data
+    try:
+        user = users_collection.find_one({'_id': user_id})
+        if not user:
+            flash('User not found', 'error')
+            return redirect(url_for('login'))
+    except Exception:
+        flash('An error occurred while fetching your profile', 'error')
+        return redirect(url_for('login'))
+
+    # Render the profile page with user data
+    return render_template('profile.html', user=user)
 
 #route for analytics page
-@app.route('/analytics')
+@app.route('/analytics', methods=['GET'])
 def analytics():
-    return render_template('analytics.html')
+    # Fetch all transactions
+    transactions = list(transactions_collection.find({}))
 
-#route for seetings page
-@app.route('/settings')
-def settings():
-    return render_template('settings.html')
+    # Ensure all transaction dates are datetime objects
+    for t in transactions:
+        if isinstance(t["date"], str):  # Convert string dates to datetime
+            try:
+                t["date"] = datetime.strptime(t["date"], "%Y-%m-%d")
+            except ValueError:
+                t["date"] = None  # Handle invalid date formats gracefully
 
+    # Filter out transactions with invalid or missing dates
+    transactions = [t for t in transactions if t["date"] is not None]
+
+    # Calculate totals
+    total_income = sum(float(t["amount"]) for t in transactions if t["type"] == "income")
+    total_expenses = sum(float(t["amount"]) for t in transactions if t["type"] == "expense")
+    savings = total_income - total_expenses
+
+    # Group expenses by category
+    expenses_by_category = {}
+    for t in transactions:
+        if t["type"] == "expense":
+            category = t["category"]
+            expenses_by_category[category] = expenses_by_category.get(category, 0) + float(t["amount"])
+
+    # Prepare data for spending trends (group by date)
+    spending_trends = {}
+    for t in transactions:
+        if t.get("date"):
+            date_str = t["date"].strftime("%Y-%m-%d")  # Convert datetime to string for grouping
+            amount = float(t["amount"])
+            spending_trends[date_str] = spending_trends.get(date_str, 0) + amount
+
+    # Sort spending trends by date
+    spending_trends = sorted(spending_trends.items())  # Returns a list of (date, amount) tuples
+
+    # Convert data for Chart.js
+    category_labels = list(expenses_by_category.keys())
+    category_values = list(expenses_by_category.values())
+    trend_dates = [date for date, _ in spending_trends]
+    trend_amounts = [amount for _, amount in spending_trends]
+
+    # Pass data to the analytics HTML template
+    return render_template(
+        'analytics.html',
+        total_income=total_income,
+        total_expenses=total_expenses,
+        savings=savings,
+        category_labels=json.dumps(category_labels or []),
+        category_values=json.dumps(category_values or []),
+        trend_dates=json.dumps(trend_dates or []),
+        trend_amounts=json.dumps(trend_amounts or [])
+    )
+
+#route for register page
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -87,6 +256,11 @@ def register():
         if password != confirm_password:
             flash('Passwords do not match!', 'error')
             return redirect(url_for('register'))
+        
+        #check if the email is alreeady exist
+        if users_collection.find_one({'email': email}):                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+            flash('this email is already exist, please try this email.', 'error')
+            return redirect(url_for('register')) 
 
         # Hash password and save user
         hashed_password = generate_password_hash(password)
@@ -106,18 +280,78 @@ def register():
     return render_template('register.html')
 
 #route for login 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
+    if request.method == 'POST':
+        print("POST request received")  # Debugging log
+
+        # Get form data
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+        # Debugging logs for received data
+        print(f"Email: {email}, Password: {password}")
+
+        # Check if email and password are provided
+        if not email or not password:
+            flash('Please provide both email and password', 'error')
+            return redirect(url_for('login'))
+
+        # Check if the user exists in the db
+        user = users_collection.find_one({'email': email})
+        print(f"User from DB: {user}")
+
+        if not user:
+            flash('User not found, please register first.', 'error')
+            return redirect(url_for('login'))
+
+        # Validate password
+        if not check_password_hash(user['password'], password):
+            flash('Password is incorrect, try again.', 'error')
+            return redirect(url_for('login'))
+
+        # Save user details in session
+        session['user_id'] = str(user['_id'])  # Store user ID
+        session['email'] = user['email']  # Store email
+
+        # Flash success message
+        flash('Login successful', 'success')
+
+        # Redirect to profile page
+        return redirect(url_for('profile'))  # Use redirect to ensure navigation
+
+    print("GET request received")  # Debugging log
+
+    # If it's a GET request, render the login page
     return render_template('login.html')
 
 #route for logout 
 @app.route('/logout')
 def logout():
-    return render_template('logout.html')
+    return redirect(url_for('login'))
 
+#route for forgort password page
 @app.route('/forgotpassword')
 def forgotpassword():
     return render_template('forgotpassword.html')
+
+#route for privacy and policy page
+@app.route('/privacy')
+def privacy_page():
+    return render_template('privacy.html')
+
+
+#route for terms and condition
+@app.route('/terms')
+def terms():
+    return render_template('terms.html')
+
+#route for terms and condition
+@app.route('/fqa')
+def fqa():
+    return render_template('fqa.html')
+   
+
 
 if __name__ == '__main__':
     app.run(debug=True) 

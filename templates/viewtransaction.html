@@ -9,50 +9,54 @@
 <body class="body-color">
 
   
-   <!-- NAVBAR -->
-   <nav class="navbar-login">
-    <div class="logo-login">
-        <a href="{{url_for ('index') }}"><img src="../static/images/Photoroom-20241204_211017~2.png" alt="FinanceTracker Logo"></a> 
-    </div>
-    <ul class="nav-links-login">
-      <li><a href="{{url_for ('index')}}">Home</a></li>
-      <li><a href="{{url_for ('dashboard')}}">Dashboard</a></li>
-      <li><a href="{{url_for ('profile')}}">Profile</a></li>
-    </ul>
-  </nav>
-
-  <div class="container-view">
-    <div class="tit-view">
-      <h1>View Transaction</h1>
-    </div>
-    <!-- Transaction Table -->
-    <table class="transaction-table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Type</th>
-          <th>Category</th>
-          <th>Amount</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Example Row -->
-        <tr>
-          <td>2024-01-01</td>
-          <td>Income</td>
-          <td>Salary</td>
-          <td>$1500.00</td>
-          <td>
-            <button class="btn-edit">Edit</button>
-            <button class="btn-delete">Delete</button>
-          </td>
-        </tr>
-        <!-- More rows will be added dynamically -->
-      </tbody>
-    </table>
+  | <!-- HEADER SECTION -->
+  <header class="hero-dash">
+   <div class="logo-dash">
+   <a href="{{url_for ('index') }}"><img src="../static/images/Photoroom-20241204_211017~2.png" alt="FinanceTracker Logo"></a> 
   </div>
-</body>
+   <!-- NAVBAR -->
+   <nav class="navbar">
+     <ul class="nav-links">
+       <li><a href="{{url_for ('index') }}">Home</a></li>
+       <li><a href="{{url_for ('analytics') }}">Analytics</a></li>
+       <li><a href="{{url_for ('addtransaction') }}">Add Transaction</a></li>
+       <li><a href="{{url_for ('viewtransaction') }}">View Transaction</a></li>
+       <li><a href="{{url_for ('profile') }}">Profile</a></li>
+     </ul>
+   </nav>
 
-<script src="{{url_for('static', filename='js/scripts.js')}}"></script>
+<!-- View Transaction Section -->
+<div class="container-view">
+  <div class="tit-view">
+    <h1>View Transaction</h1>
+  </div>
+  <!-- Transaction Table -->
+  <table class="transaction-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Type</th>
+        <th>Category</th>
+        <th>Amount</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for transaction in transactions %}
+      <tr>
+        <td>{{ transaction.date.strftime('%Y-%m-%d') if transaction.date else 'N/A' }}</td>
+        <td>{{ transaction.type }}</td>
+        <td>{{ transaction.category }}</td>
+        <td>${{ "%.2f" | format(transaction.amount) }}</td>
+        <td>
+          <button class="btn delete-btn" data-id="{{ transaction._id }}">🗑️ Delete</button>
+        </td>              
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+  <script src="{{url_for('static', filename='js/scripts.js')}}" defer></script>
+</body>
 </html>

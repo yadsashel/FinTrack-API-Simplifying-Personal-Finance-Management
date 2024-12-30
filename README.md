@@ -105,8 +105,3 @@ Special thanks to the tools and libraries that made this project possible:
 - **PyMongo**
 
 ---
-
-### 🚀 Future Enhancements
-- Add user authentication with JWT tokens.
-- Integrate frontend UI for user interaction.
-- Implement financial reports and analytics.

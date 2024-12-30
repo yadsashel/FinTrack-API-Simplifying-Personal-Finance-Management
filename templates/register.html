@@ -15,21 +15,23 @@
     </div>
     <ul class="nav-links-login">
       <li><a href="{{url_for ('index')}}">Home</a></li>
-      <li><a href="{{url_for ('dashboard')}}">Dashboard</a></li>
       <li><a href="{{url_for ('profile')}}">Profile</a></li>
     </ul>
   </nav>
 
      <!-- Flash Messages -->
-     {% with messages = get_flashed_messages() %}
-     {% if messages %}
-       <div class="flash-container">
-         {% for message in messages %}
-           <div class="flash">{{ message }}</div>
-         {% endfor %}
-       </div>
-     {% endif %}
-     {% endwith %}
+     {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="alert {{ category }}">
+              <button class="close" onclick="this.parentElement.style.display='none';">&times;</button>
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
    
 
 

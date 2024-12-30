@@ -19,7 +19,6 @@
   <nav class="navbar">
     <ul class="nav-links">
       <li><a href="{{url_for ('index') }}">Home</a></li>
-      <li><a href="{{url_for ('dashboard') }}">Dashboard</a></li>
       <li><a href="{{url_for ('analytics') }}">Analytics</a></li>
       <li><a href="{{url_for ('addtransaction') }}">Add Transaction</a></li>
       <li><a href="{{url_for ('viewtransaction') }}">View Transaction</a></li>
@@ -30,42 +29,58 @@
 
 <!-- Analytics & Reports Section -->
 <div class="container-analys">
+  <div>
   <!-- Header -->
   <header class="text-center-my-4">
-    <h1>Analytics & Reports</h1>
+      <h1>Analytics & Reports</h1>
   </header>
 
   <!-- Summary Section -->
   <section class="summary">
-    <div class="summary-card">
-      <h3>Total Income</h3>
-      <p id="total-income">$0.00</p>
-    </div>
-    <div class="summary-card">
-      <h3>Total Expenses</h3>
-      <p id="total-expenses">$0.00</p>
-    </div>
-    <div class="summary-card">
-      <h3>Savings</h3>
-      <p id="savings">$0.00</p>
-    </div>
-  </section>
-
-  <!-- Charts Section -->
-  <section class="charts">
-    <div class="chart-container">
-      <h3>Expenses by Category</h3>
-      <canvas id="category-chart"></canvas>
-    </div>
-    <div class="chart-container">
-      <h3>Spending Trends</h3>
-      <canvas id="trend-chart"></canvas>
-    </div>
+      <div class="summary-card">
+          <h3>Total Income</h3>
+          <p id="total-income">${{ total_income }}</p>
+      </div>
+      <div class="summary-card">
+          <h3>Total Expenses</h3>
+          <p id="total-expenses">${{ total_expenses }}</p>
+      </div>
+      <div class="summary-card">
+        <h3>Savings</h3>
+        <p id="savings">
+            {% if savings < 0 %}
+                ${{ "%.2f" | format(savings | abs) }}
+            {% else %}
+                ${{ "%.2f" | format(savings) }}
+            {% endif %}
+        </p>
+      </div>    
   </section>
 </div>
 
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="{{url_for('static', filename='js/scripts.js')}}"></script>
+ <!-- Charts Section -->
+ <div class="row">
+    <div class="chart-container">
+        <h3>Expenses by Category</h3>
+        <canvas id="category-chart"
+                data-labels='{{ category_labels | safe }}'
+                data-values='{{ category_values | safe }}'>
+        </canvas>
+    </div>
+    <div class="chart-container">
+        <h3>Spending Trends</h3>
+        <canvas id="trend-chart"
+                data-dates='{{ trend_dates | safe }}'
+                data-amounts='{{ trend_amounts | safe }}'>
+        </canvas>
+    </div>
+</div>
+</div>
+
+<!-- Include the Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="{{url_for('static', filename='js/scripts.js')}}"></script>
 </body>
 </html>

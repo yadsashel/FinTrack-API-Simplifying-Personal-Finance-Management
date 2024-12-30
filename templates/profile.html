@@ -4,56 +4,106 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Profile</title>
-  <link rel="stylesheet" href="{{url_for ('static', filename='css/styles.css')}}">
+  <link rel="stylesheet" href="{{ url_for ('static', filename='css/styles.css') }}">
 </head>
 <body class="body-color">
     
-   <!-- NAVBAR -->
-   <nav class="navbar-profile">
-    <div class="logo-profile">
-        <a href="{{url_for ('index') }}"><img src="../static/images/Photoroom-20241204_211017~2.png" alt="FinanceTracker Logo"></a> 
-    </div>
-    <ul class="nav-links-profile">
-      <li><a href="{{url_for ('index')}}">Home</a></li>
-      <li><a href="{{url_for ('dashboard')}}">Dashboard</a></li>
-      <li><a href="{{url_for ('logout')}}">Logout</a></li>
-    </ul>
-  </nav>
+    <!-- HEADER SECTION -->
+    <header class="hero-dash">
+      <div class="logo-dash">
+      <a href="{{url_for ('index') }}"><img src="../static/images/Photoroom-20241204_211017~2.png" alt="FinanceTracker Logo"></a> 
+     </div>
+      <!-- NAVBAR -->
+      <nav class="navbar">
+        <ul class="nav-links">
+          <li><a href="{{url_for ('index') }}">Home</a></li>
+          <li><a href="{{url_for ('analytics') }}">Analytics</a></li>
+          <li><a href="{{url_for ('addtransaction') }}">Add Transaction</a></li>
+          <li><a href="{{url_for ('viewtransaction') }}">View Transaction</a></li>
+          <li><a href="{{url_for ('profile') }}">Profile</a></li>
+        </ul>
+      </nav>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="alert {{ category }}">
+              <button class="close" onclick="this.parentElement.style.display='none';">&times;</button>
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
 
   <!-- PROFILE SECTION -->
   <section class="profile-section">
-    <h1>Your Profile</h1>
-    <form class="profile-form">
-      <div class="form-group">
-        <label for="name">Username:</label>
-        <input type="text" id="name" name="name" placeholder="Enter Your Username" required>
-      </div>
-      <div class="form-group">
-        <label for="email">Email Address:</label>
-        <input type="email" id="email" name="email" placeholder="Enter Your Email" required>
-      </div>
-      <div class="form-group">
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" placeholder="Enter Your password" required>
-      </div>
-      <div class="form-group">
-        <label for="confrim-password">Confirm Password:</la bbel>
-        <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirm Your Password"  required>
-      </div>
-      <div class="form-group">
-        <label for="phone">Phone Number:</label>
-        <input type="tel" id="phone" name="phone" placeholder="Enter Your Phone Number (Optional)">
-      </div>
-      <div class="form-group">
-        <label for="address">Address:</label>
-        <textarea id="address" name="address" placeholder="Enter Your Address required"></textarea>
-      </div>
-      <div class="form-buttons">
-        <button type="submit" class="update-button">Update Profile</button>
-        <button type="reset" class="reset-button">Reset</button>
-      </div>
+    <h1>Profile Settings</h1>
+    <form class="profile-form" method="POST" action="{{ url_for('profile') }}">
+        <div class="form-group">
+            <label for="full_name">Full Name:</label>
+            <input type="text" id="full_name" name="full_name" value="{{ user.full_name }}" required  autocomplete="name">
+        </div>
+        <div class="form-group">
+            <label for="email">Email Address:</label>
+            <input type="email" id="email" name="email" value="{{ user.email }}" required  autocomplete="email">
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Enter a new password" autocomplete="new-password" required>
+        </div>
+        <div class="form-group">
+            <label for="confirm_password">Confirm Password:</label>
+            <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm your new password" autocomplete="new-password" required>
+        </div>
+        <div class="form-group">
+            <label for="phone">Phone Number:</label>
+            <input type="tel" id="phone" name="phone" value="{{ user.phone }}">
+        </div>
+        <div class="form-group">
+            <label for="address">Address:</label>
+            <textarea id="address" name="address">{{ user.address }}</textarea>
+        </div>
+        <div class="form-buttons">
+            <button type="submit" class="update-button" >Update Profile</button>
+        </div>
     </form>
-  </section>
 
+    <!-- Preferences Section -->
+    <h3 class="app-pref">App Preferences</h3>
+    <form>
+      <div class="form-group">
+        <label for="currency">Default Currency</label>
+        <select id="currency">
+          <option value="USD">USD - US Dollar</option>
+          <option value="EUR">EUR - Euro</option>
+          <option value="GBP">GBP - British Pound</option>
+          <option value="MAD">MAD - Moroccan Dirham</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Notification Preferences</label>
+        <div>
+          <label>
+            <input type="checkbox" id="email-notifications"> Email Notifications
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="checkbox" id="app-notifications"> App Notifications
+          </label>
+        </div>
+      </div>
+      <button type="submit" class="btn">Save Preferences</button>
+
+      <!-- Danger Zone -->
+      <h3 class="app-pref">Danger Zone</h3>
+      <button class="btn btn-danger">Delete Account</button>
+    </form>
+</section>
+
+<script src="{{ url_for ('static', filename='js/scripts.js') }}"></script>
 </body>
 </html>

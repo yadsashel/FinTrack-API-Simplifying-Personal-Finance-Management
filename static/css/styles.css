@@ -1,7 +1,7 @@
 /* General body styling */
 body {
   font-family: Arial, sans-serif;
-  background-color: #f8f7f7;
+  background-color: #f3f3f3;
   margin: 0;
   padding: 0;
 }
@@ -196,6 +196,7 @@ section h2 {
   justify-content: center;
   align-items: center;
   width: 200vh;
+  margin-top: 50px;
 }
 
 .tit-view {
@@ -320,31 +321,36 @@ section h2 {
 /* Charts Section */
 .charts {
   display: flex;
-  justify-content: space-between;
-  gap: 20px;
+  justify-content: center;
+  gap: 40px; /* Increase the gap between charts */
+  padding: 20px; /* Add padding around the chart section */
 }
 
 .chart-container {
   background: #fff;
   border-radius: 10px;
-  padding: 20px;
+  padding: 30px; /* Increase padding inside each container */
   flex: 1;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); /* Make shadow more prominent */
+  margin-top: 20px;
+  max-width: 500px; /* Set a max width for each chart container */
+  min-height: 350px; /* Ensure minimum height for better layout */
 }
 
 .chart-container h3 {
   text-align: center;
-  margin-bottom: 15px;
-  font-size: 18px;
+  margin-bottom: 20px;
+  font-size: 20px; /* Increase font size */
   color: #333;
 }
 
 canvas {
   display: block;
-  width: 100%;
-  max-height: 300px;
+  width: 100vh;
+  height: 100vh; /* Set fixed height for charts */
   border-radius: 8px;
 }
+
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -361,18 +367,13 @@ canvas {
   }
 }
 
-/* Settings Page */
-.settings-section {
-  margin: 20px 0;
-  padding: 20px;
-  background: #c0ebff;
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.settings-section h3 {
+/* Settings form in the profile page */
+.app-pref {
+  padding-top: 20px;
+  font-size: 1.5rem;
+  text-align: center;
+  color: #007bff;
   margin-bottom: 20px;
-  color: #333;
 }
 
 .form-group {
@@ -680,7 +681,7 @@ section p {
 
 /* login page */
 .body-color {
-  background-color: #72aff1;
+  background: linear-gradient(135deg, #00E1FD, #007BFF); /* Modern cloudy blue */
 }
 
 .navbar-login {
@@ -814,7 +815,6 @@ input:focus {
   color: #007bff; /* Text color */
   transition: color 0.3s; /* Smooth hover effect */
   padding: 15px;
-  margin-right: 20px;
   background-color: white;
   border-radius: 20px;
 }
@@ -834,6 +834,7 @@ input:focus {
 
 .logo-profile img {
   border-radius: 40px;
+  margin-left: 40rem;
 }
 
 .profile-section {
@@ -856,7 +857,9 @@ input:focus {
 }
 
 .profile-form label {
-  display: block;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
   font-weight: bold;
   margin-bottom: 5px;
 }
@@ -913,7 +916,7 @@ input:focus {
   background-image: none;
   text-align: center;
   padding: 80px 20px;
-  background-color: #6aadf5;
+  background: linear-gradient(135deg, #00E1FD, #007BFF); /* Modern cloudy blue */
   color: white;
 }
 
@@ -976,10 +979,10 @@ table tbody tr:hover {
   display: flex;
   justify-content: space-between;
   flex-wrap: none;
-  gap: 20px;
+  gap: 100px;
   width: 30%;
   margin: 150px;
-  margin-left: 20rem;
+  margin-left: 5rem;
 }
 
 .card {
@@ -1214,22 +1217,129 @@ table tbody tr:hover {
   color: #0056b3;
 }
 
-
-.flash-container {
-  position: fixed; /* Make it fixed so it stays in view */
-  top: 20px; /* Adjust the distance from the top */
-  right: 20px; /* Adjust the distance from the right */
-  z-index: 1000; /* Ensure it appears above other content */
+/* Flash message container */
+.flash-messages {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.flash {
-  font-family: krub;
+/* Flash message style */
+.alert {
+  padding: 15px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid transparent;
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: slideIn 0.5s forwards;
+}
+
+.alert.success {
+  background-color: #4CAF50; /* Green */
+  border-color: #3e8e41;
+}
+
+.alert.error {
+  background-color: #F44336; /* Red */
+  border-color: #d32f2f;
+}
+
+/* Animation for sliding in */
+@keyframes slideIn {
+  from {
+      opacity: 0;
+      transform: translateY(-10px);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+
+/* Close button for flash messages */
+.alert .close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 16px;
+  color: white;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+/* Button Styles */
+.btn {
+  padding: 8px 12px;
+  font-size: 14px;
   font-weight: bold;
-  background-color: #f8d7da; /* Light red background */
-  color: #721c24; /* Dark red text */
-  border: 1px solid #f5c6cb; /* Border color */
-  padding: 10px 20px; /* Padding around the message */
-  margin-bottom: 10px; /* Space between messages */
-  border-radius: 40px; /* Rounded corners */
-  animation: slide-in 0.5s ease-in-out forwards, fade-out 0.5s 2.5s forwards; /* Animation */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin-bottom: 20px;
+}
+
+/* Edit Button for viewtransaction page*/
+.edit-btn {
+  background-color: #4CAF50; /* Green */
+}
+.edit-btn:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
+}
+
+/* Delete Button */
+.delete-btn {
+  background-color: #f44336; /* Red */
+}
+.delete-btn:hover {
+  background-color: #d32f2f;
+  transform: scale(1.05);
+}
+
+/* Button Container Alignment */
+td {
+  text-align: center;
+}
+
+main {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+}
+
+section {
+  margin-bottom: 20px;
+}
+
+section h2 {
+  color: #4CAF50;
+  margin-bottom: 10px;
+}
+
+footer {
+  text-align: center;
+  padding: 1em 0;
+  background-color: #333;
+  color: #fff;
+  position: relative;
+  bottom: 0;
+  width: 100%;
+}
+
+footer p {
+  margin: 0;
 }
