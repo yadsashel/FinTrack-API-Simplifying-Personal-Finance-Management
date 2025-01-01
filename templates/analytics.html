@@ -8,16 +8,14 @@
 </head>
 <body class="body-color">
 
-   <!-- HEADER SECTION -->
-<header class="hero-dash">
+ <!-- HEADER SECTION -->
+ <header class="hero-dash">
   <div class="logo-dash">
-    <a href="{{url_for ('index') }}">
-      <img src="../static/images/Photoroom-20241204_211017~2.png" alt="FinanceTracker Logo">
-    </a>
-  </div>
+  <a href="{{url_for ('index') }}"><img src="../static/images/Photoroom-20241204_211017~2.png" alt="FinanceTracker Logo"></a> 
+ </div>
   <!-- NAVBAR -->
-  <nav class="navbar">
-    <ul class="nav-links">
+  <nav class="navbar-pro">
+    <ul class="nav-links-pro">
       <li><a href="{{url_for ('index') }}">Home</a></li>
       <li><a href="{{url_for ('analytics') }}">Analytics</a></li>
       <li><a href="{{url_for ('addtransaction') }}">Add Transaction</a></li>
@@ -25,7 +23,7 @@
       <li><a href="{{url_for ('profile') }}">Profile</a></li>
     </ul>
   </nav>
-</header>
+ </header>
 
 <!-- Analytics & Reports Section -->
 <div class="container-analys">

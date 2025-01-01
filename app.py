@@ -38,7 +38,7 @@ transactions_collection = db["transaction"]
 # Send a ping to confirm a successful connection
 try:
     client.admin.command('ping')
-    print("Pinged your deployment. You successfully connected to MongoDB!") 
+    print("Pinged your deployment. You successfully connected to MongoDB!")
 except Exception as e:
     print(e)
 
@@ -291,7 +291,7 @@ def login():
 
         # Debugging logs for received data
         print(f"Email: {email}, Password: {password}")
-
+    
         # Check if email and password are provided
         if not email or not password:
             flash('Please provide both email and password', 'error')
@@ -305,7 +305,7 @@ def login():
             flash('User not found, please register first.', 'error')
             return redirect(url_for('login'))
 
-        # Validate password
+        # Validate password 
         if not check_password_hash(user['password'], password):
             flash('Password is incorrect, try again.', 'error')
             return redirect(url_for('login'))

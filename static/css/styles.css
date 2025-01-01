@@ -11,8 +11,9 @@ body {
   background-color: none;
   display: flex;
   justify-content: flex-end; /* Align the navbar to the right */
-  align-items: center; /* Vertically center the items */
+  align-items: flex-end; /* Vertically center the items */
   top: 0;
+  margin-left: 70rem;
 }
 
 /* Styling the nav-links */
@@ -37,6 +38,54 @@ body {
 
 .nav-links li a:hover {
   background-color: #d4e2fc; /* Change color on hover */
+}
+
+/* Main navbar container for other navs */
+.navbar-pro {
+  background-color: none;
+  display: flex;
+  justify-content: flex-end; /* Align the navbar to the right */
+  align-items: flex-end; /* Vertically center the items */
+  top: 0;
+}
+
+/* Styling the nav-links */
+.nav-links-pro {
+  list-style: none; /* Remove bullets */
+  display: flex; /* Align items in a row */
+  gap: 20px; /* Add spacing between links */
+}
+
+/* Styling individual links */
+.nav-links-pro li a {
+  text-decoration: none; /* Remove underline */
+  color: #007bff; /* Text color */
+  font-weight: bold; /* Make text bold */
+  font-size: 1.2rem;
+  transition: color 0.3s; /* Smooth hover effect */
+  padding: 15px;
+  margin-right: 20px;
+  background-color: white;
+  border-radius: 20px;
+}
+
+.nav-links-pro li a:hover {
+  background-color: #d4e2fc; /* Change color on hover */
+}
+
+/* Hamburger Menu */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  gap: 5px;
+}
+
+.hamburger span {
+  width: 25px;
+  height: 3px;
+  background-color: white;
+  border-radius: 2px;
 }
 
 
@@ -75,7 +124,8 @@ header {
 header h1 {
   color: #333;
   font-size: 36px;
-  margin-bottom: 20px;
+  margin-top: 3rem;
+  margin-bottom: 40px;
   text-align: center;
 }
 
@@ -94,24 +144,18 @@ header h1 {
 
 /* Section title styling */
 section h2 {
-  font-size: 28px;
+  font-size: 40px;
   margin-top: 40px;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
   text-align: left;
   color: #333;
 }
 
-/* Responsive Navigation */
-@media (max-width: 768px) {
-  .navbar {
-    flex-direction: column;
-  }
-  .navbar .nav-links {
-    flex-direction: column;
-  }
-  .navbar .nav-links li {
-    margin: 10px 0;
-  }
+section .h2-feat {
+  font-size: 3rem;
+  margin-top: 40px;
+  margin-bottom: 40px;
+  text-align: left;
 }
 
 /* add transaction form styling */
@@ -125,6 +169,15 @@ section h2 {
   max-width: 500px;
   margin: auto;
   margin-top: 60px;
+}
+
+.container-add {
+  max-width: 90%;
+  margin: 30px auto;
+  background: #b9e4f1;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
 }
 
 .container-add h1 {
@@ -197,6 +250,12 @@ section h2 {
   align-items: center;
   width: 200vh;
   margin-top: 50px;
+  max-width: 90%;
+  margin: 30px auto;
+  background: #b9e4f1;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
 }
 
 .tit-view {
@@ -666,18 +725,6 @@ section p {
   font-size: 14px;
 }
 
-/* Make the footer responsive */
-@media (max-width: 768px) {
-  .footer-content {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .social-media,
-  .footer-links {
-    align-items: center;
-  }
-}
 
 /* login page */
 .body-color {
@@ -1342,4 +1389,45 @@ footer {
 
 footer p {
   margin: 0;
+}
+
+
+/* -------------------------------------------------   setting up the responsive viewporst for all deffirent sizes  ------------------------------------------------------------- */
+/* Home Page */
+@media (max-width: 600px) {
+  .logo img {
+      transform: scale(0.7); /* Adjust scaling value as needed */
+      transform-origin: center; /* Ensure scaling happens from the center */
+      margin-left: -70px;
+  }
+
+  .navbar {
+      margin-left: 32rem;
+  }
+
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    background-color: #333;
+    position: absolute;
+    top: 50px;
+    right: 20px;
+    width: 150px;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.nav-links.active {
+    display: flex;
+}
+
+.hamburger {
+    display: flex;
+}
+}
+
+@media (max-width: 300px) {
+  .navbar {
+    margin-left: 20rem;
+  }
 }

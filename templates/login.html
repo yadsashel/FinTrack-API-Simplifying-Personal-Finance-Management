@@ -8,17 +8,20 @@
 </head>
 <body class="body-color">
   
-   <!-- NAVBAR -->
-   <nav class="navbar-login">
-    <div class="logo-login">
-        <a href="{{url_for ('index') }}"><img src="../static/images/Photoroom-20241204_211017~2.png" alt="FinanceTracker Logo"></a> 
-    </div>
-    <ul class="nav-links-login">
-      <li><a href="{{url_for ('index')}}">Home</a></li>
-      <li><a href="{{url_for ('profile')}}">Profile</a></li>
-    </ul>
-  </nav>
-
+   <!-- HEADER SECTION -->
+   <header class="hero-dash">
+    <div class="logo-dash">
+    <a href="{{url_for ('index') }}"><img src="../static/images/Photoroom-20241204_211017~2.png" alt="FinanceTracker Logo"></a> 
+   </div>
+    <!-- NAVBAR -->
+    <nav class="navbar-pro">
+      <ul class="nav-links-pro">
+        <li><a href="#about">About</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="{{url_for ('profile') }}">Profile</a></li>
+      </ul>
+    </nav>
+   </header>
 
    <!-- Flash Messages -->
    {% with messages = get_flashed_messages(with_categories=true) %}

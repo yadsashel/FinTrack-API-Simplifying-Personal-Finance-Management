@@ -230,24 +230,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
       });
   });
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 
 //handling the charts
@@ -448,4 +431,12 @@ button.addEventListener('click', async function () {
     console.error('Error deleting transaction:', error);
   }
 });
+});
+
+// JavaScript to toggle the menu on small screens
+const hamburger = document.getElementById('hamburger');
+const navLinks = document.getElementById('nav-links');
+
+hamburger.addEventListener('click', () => {
+    navLinks.classList.toggle('active');
 });
