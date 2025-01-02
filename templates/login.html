@@ -13,6 +13,25 @@
     <div class="logo-dash">
     <a href="{{url_for ('index') }}"><img src="../static/images/Photoroom-20241204_211017~2.png" alt="FinanceTracker Logo"></a> 
    </div>
+
+  <!-- Toggle checkbox for hamburger -->
+  <input type="checkbox" id="navbarToggle">
+
+  <!-- Hamburger icon for toggle -->
+  <label for="navbarToggle" class="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+  </label>
+
+  <!-- Side navbar -->
+  <div class="side-navbar">
+      <ul>
+          <li><a href="{{ url_for ('index') }}">Home</a></li>
+          <li><a href="{{ url_for('profile') }}">Profile</a></li>
+      </ul>
+  </div>
+
     <!-- NAVBAR -->
     <nav class="navbar-pro">
       <ul class="nav-links-pro">

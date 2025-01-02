@@ -230,213 +230,140 @@ document.addEventListener("DOMContentLoaded", () => {
           }
       });
   });
-}
+})
 
 
-//handling the charts
+// Handling the charts
 document.addEventListener("DOMContentLoaded", () => {
-  const getData = (selector, attribute) => {
+    const getData = (selector, attribute) => {
       const element = document.querySelector(selector);
       try {
-          const data = element.dataset[attribute];
-          return JSON.parse(data || "[]"); // Default to empty array if data is undefined
+        const data = element.dataset[attribute];
+        return JSON.parse(data || "[]"); // Default to empty array if data is undefined
       } catch (error) {
-          console.error(`Error parsing data-${attribute}:`, error);
-          return [];
+        console.error(`Error parsing data-${attribute}:`, error);
+        return [];
       }
-  };
-
-  // Fetch data from the canvas elements
-  const categoryLabels = getData("#category-chart", "labels");
-  const categoryValues = getData("#category-chart", "values");
-  const trendDates = getData("#trend-chart", "dates");
-  const trendAmounts = getData("#trend-chart", "amounts");
-
-  if (!categoryLabels.length || !categoryValues.length) {
+    };
+  
+    // Fetch data from the canvas elements
+    const categoryLabels = getData("#category-chart", "labels");
+    const categoryValues = getData("#category-chart", "values");
+    const trendDates = getData("#trend-chart", "dates");
+    const trendAmounts = getData("#trend-chart", "amounts");
+  
+    if (!categoryLabels.length || !categoryValues.length) {
       console.warn("Category data is missing or empty.");
-  }
-  if (!trendDates.length || !trendAmounts.length) {
+    }
+    if (!trendDates.length || !trendAmounts.length) {
       console.warn("Trend data is missing or empty.");
-  }
-
-  // Expenses by Category Chart
-  new Chart(document.getElementById("category-chart"), {
+    }
+  
+    // Expenses by Category Chart
+    new Chart(document.getElementById("category-chart"), {
       type: "bar",
       data: {
-          labels: categoryLabels,
-          datasets: [{
-              label: "Expenses by Category",
-              data: categoryValues,
-              backgroundColor: categoryLabels.map((_, i) =>
-                  `hsl(${(i * 40) % 360}, 70%, 60%)`
-              ),
-              borderColor: "#fff",
-              borderWidth: 1,
-          }],
+        labels: categoryLabels,
+        datasets: [
+          {
+            label: "Expenses by Category",
+            data: categoryValues,
+            backgroundColor: categoryLabels.map((_, i) =>
+              `hsl(${(i * 40) % 360}, 70%, 60%)`
+            ),
+            borderColor: "#fff",
+            borderWidth: 1,
+          },
+        ],
       },
       options: {
-          responsive: true,
-          scales: {
-              x: { title: { display: true, text: "Categories" } },
-              y: { title: { display: true, text: "Amount ($)" } },
-          },
+        responsive: true,
+        scales: {
+          x: { title: { display: true, text: "Categories" } },
+          y: { title: { display: true, text: "Amount ($)" } },
+        },
       },
-  });
-
-  // Spending Trends Chart
-  new Chart(document.getElementById("trend-chart"), {
+    });
+  
+    // Spending Trends Chart
+    new Chart(document.getElementById("trend-chart"), {
       type: "line",
       data: {
-          labels: trendDates,
-          datasets: [{
-              label: "Spending Trends",
-              data: trendAmounts,
-              borderColor: "#3b82f6",
-              backgroundColor: "rgba(59, 130, 246, 0.2)",
-              fill: true,
-          }],
+        labels: trendDates,
+        datasets: [
+          {
+            label: "Spending Trends",
+            data: trendAmounts,
+            borderColor: "#3b82f6",
+            backgroundColor: "rgba(59, 130, 246, 0.2)",
+            fill: true,
+          },
+        ],
       },
       options: {
-          responsive: true,
-          scales: {
-              x: { title: { display: true, text: "Date" } },
-              y: { title: { display: true, text: "Amount ($)" } },
-          },
+        responsive: true,
+        scales: {
+          x: { title: { display: true, text: "Date" } },
+          y: { title: { display: true, text: "Amount ($)" } },
+        },
       },
-  });
-});
-
-// Get the canvas elements
-const categoryChartCanvas = document.getElementById('categoryChart').getContext('2d');
-const trendsChartCanvas = document.getElementById('trendsChart').getContext('2d');
-
-// Data for "Expenses by Category"
-const categoryData = {
-labels: ['Rent', 'Gym', 'Groceries', 'Utilities'], // Example categories
-datasets: [
-  {
-    label: 'Expenses by Category',
-    data: [500, 200, 150, 300], // Example data
-    backgroundColor: ['#f87171', '#3b82f6', '#10b981', '#fbbf24'], // Colors for each bar
-    borderWidth: 1,
-  },
-],
-};
-
-// Data for "Spending Trends"
-const trendsData = {
-labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'], // Example months
-datasets: [
-  {
-    label: 'Spending Trends',
-    data: [800, 600, 700, 900, 1000], // Example data
-    backgroundColor: '#3b82f6',
-    borderColor: '#2563eb',
-    borderWidth: 2,
-    fill: true,
-  },
-],
-};
-
-// Configuration for "Expenses by Category" chart
-const categoryChartConfig = {
-type: 'bar',
-data: categoryData,
-options: {
-  responsive: true,
-  maintainAspectRatio: false, // Allows chart to fill the container
-  plugins: {
-    legend: {
-      display: true,
-      position: 'top',
-    },
-    tooltip: {
-      enabled: true,
-    },
-  },
-  scales: {
-    x: {
-      title: {
-        display: true,
-        text: 'Categories',
-      },
-    },
-    y: {
-      title: {
-        display: true,
-        text: 'Amount',
-      },
-      beginAtZero: true,
-    },
-  },
-},
-};
-
-// Configuration for "Spending Trends" chart
-const trendsChartConfig = {
-type: 'line',
-data: trendsData,
-options: {
-  responsive: true,
-  maintainAspectRatio: false, // Allows chart to fill the container
-  plugins: {
-    legend: {
-      display: true,
-      position: 'top',
-    },
-    tooltip: {
-      enabled: true,
-    },
-  },
-  scales: {
-    x: {
-      title: {
-        display: true,
-        text: 'Months',
-      },
-    },
-    y: {
-      title: {
-        display: true,
-        text: 'Amount',
-      },
-      beginAtZero: true,
-    },
-  },
-},
-};
-
-// Initialize charts
-new Chart(categoryChartCanvas, categoryChartConfig);
-new Chart(trendsChartCanvas, trendsChartConfig);
-
-// Handle Delete Button
-document.querySelectorAll('.delete-btn').forEach(button => {
-button.addEventListener('click', async function () {
-  const transactionId = this.dataset.id;
-
-  try {
-    const response = await fetch(`/delete_transaction/${transactionId}`, {
-      method: 'POST',
     });
-    const result = await response.json();
-
-    if (response.ok) {
-      alert(result.message);
-      location.reload(); // Reload the page to update the table and analytics
-    } else {
-      alert(`Error: ${result.message}`);
-    }
-  } catch (error) {
-    console.error('Error deleting transaction:', error);
-  }
-});
-});
-
-// JavaScript to toggle the menu on small screens
-const hamburger = document.getElementById('hamburger');
-const navLinks = document.getElementById('nav-links');
-
-hamburger.addEventListener('click', () => {
-    navLinks.classList.toggle('active');
-});
+  
+    // Initialize Charts
+    const categoryChartCanvas = document.getElementById("categoryChart").getContext("2d");
+    const trendsChartCanvas = document.getElementById("trendsChart").getContext("2d");
+  
+    const categoryData = {
+      labels: ["Rent", "Gym", "Groceries", "Utilities"],
+      datasets: [
+        {
+          label: "Expenses by Category",
+          data: [500, 200, 150, 300],
+          backgroundColor: ["#f87171", "#3b82f6", "#10b981", "#fbbf24"],
+          borderWidth: 1,
+        },
+      ],
+    };
+  
+    const categoryChartConfig = {
+      type: "bar",
+      data: categoryData,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { title: { display: true, text: "Categories" } },
+          y: { title: { display: true, text: "Amount" }, beginAtZero: true },
+        },
+      },
+    };
+  
+    const trendsData = {
+      labels: ["Jan", "Feb", "Mar", "Apr", "May"],
+      datasets: [
+        {
+          label: "Spending Trends",
+          data: [800, 600, 700, 900, 1000],
+          borderColor: "#2563eb",
+          backgroundColor: "#3b82f6",
+          fill: true,
+        },
+      ],
+    };
+  
+    const trendsChartConfig = {
+      type: "line",
+      data: trendsData,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { title: { display: true, text: "Months" } },
+          y: { title: { display: true, text: "Amount" }, beginAtZero: true },
+        },
+      },
+    };
+  
+    new Chart(categoryChartCanvas, categoryChartConfig);
+    new Chart(trendsChartCanvas, trendsChartConfig);
+  });  
