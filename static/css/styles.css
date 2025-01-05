@@ -1948,8 +1948,8 @@ footer p {
 }
 
 .container-view {
-  width: 43vh;
-  height: 81vh;
+  width: 85%;
+  height: 100vh;
 }
 
 .transaction-table {
