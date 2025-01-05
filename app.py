@@ -80,23 +80,23 @@ def addtransaction():
 # Route for view transaction page
 @app.route('/viewtransaction', methods=['GET', 'POST'])
 def viewtransaction():
+    # Check if user is logged in
     if 'user_id' not in session:
-        return jsonify({"message": "User not logged in"}), 401
+        flash('Please log in to view transactions', 'error')
+        return redirect(url_for('login'))
 
-    user_id = session['user_id']  # Get the logged-in user's ID
+    user_id = session['user_id']
 
     if request.method == 'POST':
         action = request.json.get('action')
         transaction_id = request.json.get('id')
 
         if action == 'delete':
-            # Ensure only user's transactions are deleted
             transactions_collection.delete_one({"_id": ObjectId(transaction_id), "user_id": user_id})
             return jsonify({"message": "Transaction deleted successfully"}), 200
 
         elif action == 'edit':
             updated_data = request.json.get('updatedData')
-            # Ensure only user's transactions are updated
             transactions_collection.update_one(
                 {"_id": ObjectId(transaction_id), "user_id": user_id},
                 {"$set": updated_data}
@@ -105,7 +105,7 @@ def viewtransaction():
 
         return jsonify({"message": "Invalid action"}), 400
 
-    # Fetch only the logged-in user's transactions
+    # Fetch transactions for the logged-in user and ensure date is a datetime object
     transactions = list(transactions_collection.find({"user_id": user_id}))
     for transaction in transactions:
         transaction["_id"] = str(transaction["_id"])
@@ -119,6 +119,18 @@ def viewtransaction():
                 transaction["date"] = None
 
     return render_template('viewtransaction.html', transactions=transactions)
+
+
+# Route for delete button
+@app.route('/delete-transaction/<transaction_id>', methods=['DELETE'])
+def delete_transaction(transaction_id):
+    if 'user_id' not in session:
+        return jsonify({"success": False, "message": "Unauthorized access"}), 403
+
+    user_id = session['user_id']
+    transactions_collection.delete_one({"_id": ObjectId(transaction_id), "user_id": user_id})
+    return jsonify({"success": True, "message": "Transaction deleted successfully."})
+
 
 # Route for profile
 @app.route('/profile', methods=['GET', 'POST'])
@@ -182,36 +194,43 @@ def profile():
     # Render the profile page with user data
     return render_template('profile.html', user=user)
 
-#route for analytics page
+# Route for analytics page
 @app.route('/analytics', methods=['GET'])
 def analytics():
+    # Check if user is logged in
     if 'user_id' not in session:
-        return jsonify({"message": "User not logged in"}), 401
+        flash('Please log in to view analytics', 'error')
+        return redirect(url_for('login'))
 
-    user_id = session['user_id']  # Get the logged-in user's ID
+    user_id = session['user_id']
 
-    # Fetch only the logged-in user's transactions
+    # Fetch transactions for the logged-in user
     transactions = list(transactions_collection.find({"user_id": user_id}))
 
+    # Ensure all transaction dates are datetime objects
     for t in transactions:
-        if isinstance(t["date"], str):
+        if isinstance(t.get("date"), str):  # Convert string dates to datetime
             try:
                 t["date"] = datetime.strptime(t["date"], "%Y-%m-%d")
             except ValueError:
-                t["date"] = None
+                t["date"] = None  # Handle invalid date formats gracefully
 
-    transactions = [t for t in transactions if t["date"] is not None]
+    # Filter out transactions with invalid or missing dates
+    transactions = [t for t in transactions if t.get("date") is not None]
 
-    total_income = sum(float(t["amount"]) for t in transactions if t["type"] == "income")
-    total_expenses = sum(float(t["amount"]) for t in transactions if t["type"] == "expense")
+    # Calculate totals
+    total_income = sum(float(t["amount"]) for t in transactions if t.get("type") == "income")
+    total_expenses = sum(float(t["amount"]) for t in transactions if t.get("type") == "expense")
     savings = total_income - total_expenses
 
+    # Group expenses by category
     expenses_by_category = {}
     for t in transactions:
-        if t["type"] == "expense":
-            category = t["category"]
+        if t.get("type") == "expense":
+            category = t.get("category", "Uncategorized")
             expenses_by_category[category] = expenses_by_category.get(category, 0) + float(t["amount"])
 
+    # Prepare data for spending trends (group by date)
     spending_trends = {}
     for t in transactions:
         if t.get("date"):
@@ -219,13 +238,16 @@ def analytics():
             amount = float(t["amount"])
             spending_trends[date_str] = spending_trends.get(date_str, 0) + amount
 
+    # Sort spending trends by date
     spending_trends = sorted(spending_trends.items())
 
+    # Convert data for Chart.js
     category_labels = list(expenses_by_category.keys())
     category_values = list(expenses_by_category.values())
     trend_dates = [date for date, _ in spending_trends]
     trend_amounts = [amount for _, amount in spending_trends]
 
+    # Pass data to the analytics HTML template
     return render_template(
         'analytics.html',
         total_income=total_income,
@@ -236,7 +258,6 @@ def analytics():
         trend_dates=json.dumps(trend_dates or []),
         trend_amounts=json.dumps(trend_amounts or [])
     )
-
 
 #route for register page
 @app.route('/register', methods=['GET', 'POST'])
