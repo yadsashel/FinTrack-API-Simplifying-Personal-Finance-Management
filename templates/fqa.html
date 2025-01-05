@@ -27,9 +27,12 @@
   <!-- Side navbar -->
   <div class="side-navbar">
       <ul>
-          <li><a href="#about">About</a></li>
-          <li><a href="#features">Features</a></li>
-          <li><a href="{{ url_for('profile') }}">Profile</a></li>
+        <li><a href="{{url_for ('index') }}">Home</a></li>
+        <li><a href="{{url_for ('analytics') }}">Analytics</a></li>
+        <li><a href="{{url_for ('addtransaction') }}">Add Transaction</a></li>
+        <li><a href="{{url_for ('viewtransaction') }}">View Transaction</a></li>
+        <li><a href="{{url_for ('profile') }}">Profile</a></li>
+      </ul>
       </ul>
   </div>
 
@@ -45,28 +48,61 @@
         </nav>
     </header>
     
-    <h1>Frequently Asked Questions (FAQ)</h1>
-
-    <main>
-        <section>
-            <h2>What is this platform about?</h2>
-            <p>Our platform provides [describe your service or product] to help users achieve their goals.</p>
+    <h1 class="terms">FAQ</h1>
+    <main class="faq-container">
+        <section class="faq-section">
+            <h2 class="faq-heading">What is this platform about?</h2>
+            <p class="faq-paragraph">
+                Our platform provides <span class="faq-highlight">innovative solutions</span> to help users achieve their goals.
+            </p>
         </section>
-        <section>
-            <h2>How can I contact support?</h2>
-            <p>You can reach out to our support team via email at support@yourcompany.com.</p>
+        <section class="faq-section">
+            <h2 class="faq-heading">How can I contact support?</h2>
+            <p class="faq-paragraph">
+                You can reach out to our support team via email at 
+                <a href="mailto:support@yourcompany.com" class="faq-link">support@fintracker.com</a>.
+            </p>
         </section>
-        <section>
-            <h2>What payment methods do you accept?</h2>
-            <p>We accept credit cards, PayPal, and other major payment options.</p>
+        <section class="faq-section">
+            <h2 class="faq-heading">What payment methods do you accept?</h2>
+            <p class="faq-paragraph">
+                We accept <span class="faq-highlight">credit cards, PayPal,</span> and other major payment options.
+            </p>
         </section>
-        <section>
-            <h2>Can I cancel my subscription?</h2>
-            <p>Yes, you can cancel anytime by visiting your account settings.</p>
+        <section class="faq-section">
+            <h2 class="faq-heading">Can I cancel my subscription?</h2>
+            <p class="faq-paragraph">
+                Yes, you can cancel anytime by visiting your <a href="#account-settings" class="faq-link">account settings</a>.
+            </p>
         </section>
     </main>
-    <footer>
-        <p>&copy; 2024 Your Company. All rights reserved.</p>
-    </footer>
+    
+    
+     <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-content">
+      <!-- Social Media Links Section -->
+      <div class="social-media">
+        <a href="#" class="social-icon"><i class="fab fa-facebook"></i> Facebook</a>
+        <a href="#" class="social-icon"><i class="fab fa-twitter"></i> Twitter</a>
+        <a href="#" class="social-icon"><i class="fab fa-instagram"></i> Instagram</a>
+        <a href="#" class="social-icon"><i class="fab fa-linkedin"></i> LinkedIn</a>
+      </div>
+
+      <!-- Footer Links Section -->
+      <div class="footer-links">
+        <a href="{{ url_for ('privacy_page') }}" class="footer-link">Privacy Policy</a>
+        <a href="{{ url_for ('terms') }}" class="footer-link">Terms & Conditions</a>
+        <a href="{{ url_for ('fqa') }}" class="footer-link">FAQ</a>
+      </div>
+
+      <!-- Copyright Section -->
+      <div class="copyright">
+        <p>&copy; 2024 FinanceTracker. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+   
 </body>
 </html>

@@ -7,29 +7,99 @@
     <link rel="stylesheet" href="{{ url_for ('static', filename='css/styles.css') }}">
 </head>
 <body>
-    <header>
-        <h1>Privacy Policy</h1>
-    </header>
-    <main>
-        <section>
-            <h2>Introduction</h2>
-            <p>Your privacy is important to us. This Privacy Policy explains how we collect, use, and protect your information.</p>
-        </section>
-        <section>
-            <h2>Information We Collect</h2>
-            <p>We collect information you provide directly to us, such as when you sign up or contact us.</p>
-        </section>
-        <section>
-            <h2>How We Use Your Information</h2>
-            <p>We use your information to provide and improve our services, communicate with you, and ensure security.</p>
-        </section>
-        <section>
-            <h2>Your Rights</h2>
-            <p>You have the right to access, update, or delete your information. Contact us to exercise your rights.</p>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2024 Your Company. All rights reserved.</p>
-    </footer>
+    
+     <!-- HEADER SECTION -->
+   <header class="hero-dash">
+    <div class="logo-dash">
+    <a href="{{url_for ('index') }}"><img src="../static/images/Photoroom-20241204_211017~2.png" alt="FinanceTracker Logo"></a> 
+   </div>
+
+   <!-- Toggle checkbox for hamburger -->
+  <input type="checkbox" id="navbarToggle">
+
+  <!-- Hamburger icon for toggle -->
+  <label for="navbarToggle" class="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+  </label>
+
+  <!-- Side navbar -->
+  <div class="side-navbar">
+      <ul>
+        <li><a href="{{url_for ('index') }}">Home</a></li>
+        <li><a href="{{url_for ('analytics') }}">Analytics</a></li>
+        <li><a href="{{url_for ('addtransaction') }}">Add Transaction</a></li>
+        <li><a href="{{url_for ('viewtransaction') }}">View Transaction</a></li>
+        <li><a href="{{url_for ('profile') }}">Profile</a></li>
+      </ul>
+  </div>
+
+    <!-- NAVBAR -->
+    <nav class="navbar-pro">
+      <ul class="nav-links-pro">
+        <li><a href="{{url_for ('index') }}">Home</a></li>
+        <li><a href="{{url_for ('analytics') }}">Analytics</a></li>
+        <li><a href="{{url_for ('addtransaction') }}">Add Transaction</a></li>
+        <li><a href="{{url_for ('viewtransaction') }}">View Transaction</a></li>
+        <li><a href="{{url_for ('profile') }}">Profile</a></li>
+      </ul>
+    </nav>
+   </header>
+     
+
+   <h1 class="terms">Privacy & Policy</h1>
+   <main class="privacy-container">
+    <section class="privacy-section privacy-intro">
+        <h2 class="privacy-heading">Introduction</h2>
+        <p class="privacy-paragraph">
+            Your privacy is important to us. This Privacy Policy explains how we collect, use, and protect your information.
+        </p>
+    </section>
+    <section class="privacy-section privacy-info">
+        <h2 class="privacy-heading">Information We Collect</h2>
+        <p class="privacy-paragraph">
+            We collect information you provide directly to us, such as when you sign up or contact us.
+        </p>
+    </section>
+    <section class="privacy-section privacy-usage">
+        <h2 class="privacy-heading">How We Use Your Information</h2>
+        <p class="privacy-paragraph">
+            We use your information to provide and improve our services, communicate with you, and ensure security.
+        </p>
+    </section>
+    <section class="privacy-section privacy-rights">
+        <h2 class="privacy-heading">Your Rights</h2>
+        <p class="privacy-paragraph">
+            You have the right to access, update, or delete your information. Contact us to exercise your rights.
+        </p>
+    </section>
+</main>
+
+   <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-content">
+      <!-- Social Media Links Section -->
+      <div class="social-media">
+        <a href="#" class="social-icon"><i class="fab fa-facebook"></i> Facebook</a>
+        <a href="#" class="social-icon"><i class="fab fa-twitter"></i> Twitter</a>
+        <a href="#" class="social-icon"><i class="fab fa-instagram"></i> Instagram</a>
+        <a href="#" class="social-icon"><i class="fab fa-linkedin"></i> LinkedIn</a>
+      </div>
+
+      <!-- Footer Links Section -->
+      <div class="footer-links">
+        <a href="{{ url_for ('privacy_page') }}" class="footer-link">Privacy Policy</a>
+        <a href="{{ url_for ('terms') }}" class="footer-link">Terms & Conditions</a>
+        <a href="{{ url_for ('fqa') }}" class="footer-link">FAQ</a>
+      </div>
+
+      <!-- Copyright Section -->
+      <div class="copyright">
+        <p>&copy; 2024 FinanceTracker. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+
 </body>
 </html>

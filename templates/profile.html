@@ -94,33 +94,6 @@
         </div>
     </form>
 
-    <!-- Preferences Section -->
-    <h3 class="app-pref">App Preferences</h3>
-    <form>
-      <div class="form-group">
-        <label for="currency">Default Currency</label>
-        <select id="currency">
-          <option value="USD">USD - US Dollar</option>
-          <option value="EUR">EUR - Euro</option>
-          <option value="GBP">GBP - British Pound</option>
-          <option value="MAD">MAD - Moroccan Dirham</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Notification Preferences</label>
-        <div>
-          <label>
-            <input type="checkbox" id="email-notifications"> Email Notifications
-          </label>
-        </div>
-        <div>
-          <label>
-            <input type="checkbox" id="app-notifications"> App Notifications
-          </label>
-        </div>
-      </div>
-      <button type="submit" class="btn">Save Preferences</button>
-
       <!-- Danger Zone -->
       <h3 class="app-pref">Danger Zone</h3>
       <button class="btn btn-danger">Delete Account</button>
@@ -129,6 +102,7 @@
       <a class="btn-logout" href="{{ url_for ('logout') }}">Logout</a>
     </form>
 </section>
+
 
 <script src="{{ url_for ('static', filename='js/scripts.js') }}"></script>
 </body>
