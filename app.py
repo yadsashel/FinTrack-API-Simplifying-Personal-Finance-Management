@@ -80,56 +80,59 @@ def addtransaction():
 # Route for view transaction page
 @app.route('/viewtransaction', methods=['GET', 'POST'])
 def viewtransaction():
-    # Check if user is logged in
-    if 'user_id' not in session:
-        flash('Please log in to view transactions', 'error')
-        return redirect(url_for('login'))
+    try:
+        if request.method == 'POST':
+            action = request.json.get('action')
+            transaction_id = request.json.get('id')
 
-    user_id = session['user_id']
+            if not transaction_id or not action:
+                return jsonify({"message": "Missing action or transaction ID"}), 400
 
-    if request.method == 'POST':
-        action = request.json.get('action')
-        transaction_id = request.json.get('id')
+            if action == 'delete':
+                transactions_collection.delete_one({"_id": ObjectId(transaction_id)})
+                return jsonify({"message": "Transaction deleted successfully"}), 200
 
-        if action == 'delete':
-            transactions_collection.delete_one({"_id": ObjectId(transaction_id), "user_id": user_id})
-            return jsonify({"message": "Transaction deleted successfully"}), 200
+            elif action == 'edit':
+                updated_data = request.json.get('updatedData', {})
+                if not updated_data:
+                    return jsonify({"message": "No update data provided"}), 400
 
-        elif action == 'edit':
-            updated_data = request.json.get('updatedData')
-            transactions_collection.update_one(
-                {"_id": ObjectId(transaction_id), "user_id": user_id},
-                {"$set": updated_data}
-            )
-            return jsonify({"message": "Transaction updated successfully"}), 200
+                # Update the transaction in the database
+                transactions_collection.update_one(
+                    {"_id": ObjectId(transaction_id)},
+                    {"$set": updated_data}
+                )
+                return jsonify({"message": "Transaction updated successfully"}), 200
 
-        return jsonify({"message": "Invalid action"}), 400
+            return jsonify({"message": "Invalid action"}), 400
 
-    # Fetch transactions for the logged-in user and ensure date is a datetime object
-    transactions = list(transactions_collection.find({"user_id": user_id}))
-    for transaction in transactions:
-        transaction["_id"] = str(transaction["_id"])
-        if "date" in transaction:
-            if isinstance(transaction["date"], str):
-                try:
-                    transaction["date"] = datetime.strptime(transaction["date"], "%Y-%m-%d")
-                except ValueError:
+        # GET request: Fetch transactions
+        transactions = list(transactions_collection.find())
+        for transaction in transactions:
+            transaction["_id"] = str(transaction["_id"])  # Convert ObjectId to string for JSON serialization
+            if "date" in transaction:
+                if isinstance(transaction["date"], str):
+                    try:
+                        transaction["date"] = datetime.strptime(transaction["date"], "%Y-%m-%d")
+                    except ValueError:
+                        transaction["date"] = None  # Handle invalid dates gracefully
+                elif not isinstance(transaction["date"], datetime):
                     transaction["date"] = None
-            elif not isinstance(transaction["date"], datetime):
-                transaction["date"] = None
 
-    return render_template('viewtransaction.html', transactions=transactions)
+        return render_template('viewtransaction.html', transactions=transactions)
 
+    except Exception as e:
+        flash(f"Error loading transactions: {str(e)}", "error")
+        return redirect(url_for('home'))
 
-# Route for delete button
 @app.route('/delete-transaction/<transaction_id>', methods=['DELETE'])
 def delete_transaction(transaction_id):
-    if 'user_id' not in session:
-        return jsonify({"success": False, "message": "Unauthorized access"}), 403
+    try:
+        transactions_collection.delete_one({"_id": ObjectId(transaction_id)})
+        return jsonify({"success": True, "message": "Transaction deleted successfully."}), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": f"Error deleting transaction: {str(e)}"}), 500
 
-    user_id = session['user_id']
-    transactions_collection.delete_one({"_id": ObjectId(transaction_id), "user_id": user_id})
-    return jsonify({"success": True, "message": "Transaction deleted successfully."})
 
 
 # Route for profile
@@ -194,70 +197,69 @@ def profile():
     # Render the profile page with user data
     return render_template('profile.html', user=user)
 
-# Route for analytics page
+#route for analytics page
 @app.route('/analytics', methods=['GET'])
 def analytics():
-    # Check if user is logged in
-    if 'user_id' not in session:
-        flash('Please log in to view analytics', 'error')
-        return redirect(url_for('login'))
+    try:
+        # Fetch all transactions
+        transactions = list(transactions_collection.find({}))
 
-    user_id = session['user_id']
+        # Ensure all transaction dates are datetime objects
+        for t in transactions:
+            if isinstance(t.get("date"), str):  # Convert string dates to datetime
+                try:
+                    t["date"] = datetime.strptime(t["date"], "%Y-%m-%d")
+                except ValueError:
+                    t["date"] = None  # Handle invalid date formats gracefully
 
-    # Fetch transactions for the logged-in user
-    transactions = list(transactions_collection.find({"user_id": user_id}))
+        # Filter out transactions with invalid or missing dates
+        transactions = [t for t in transactions if t["date"] is not None]
 
-    # Ensure all transaction dates are datetime objects
-    for t in transactions:
-        if isinstance(t.get("date"), str):  # Convert string dates to datetime
-            try:
-                t["date"] = datetime.strptime(t["date"], "%Y-%m-%d")
-            except ValueError:
-                t["date"] = None  # Handle invalid date formats gracefully
+        # Calculate totals
+        total_income = sum(float(t.get("amount", 0)) for t in transactions if t.get("type") == "income")
+        total_expenses = sum(float(t.get("amount", 0)) for t in transactions if t.get("type") == "expense")
+        savings = total_income - total_expenses
 
-    # Filter out transactions with invalid or missing dates
-    transactions = [t for t in transactions if t.get("date") is not None]
+        # Group expenses by category
+        expenses_by_category = {}
+        for t in transactions:
+            if t.get("type") == "expense":
+                category = t.get("category", "Uncategorized")
+                expenses_by_category[category] = expenses_by_category.get(category, 0) + float(t.get("amount", 0))
 
-    # Calculate totals
-    total_income = sum(float(t["amount"]) for t in transactions if t.get("type") == "income")
-    total_expenses = sum(float(t["amount"]) for t in transactions if t.get("type") == "expense")
-    savings = total_income - total_expenses
+        # Prepare data for spending trends (group by date)
+        spending_trends = {}
+        for t in transactions:
+            if t.get("date"):
+                date_str = t["date"].strftime("%Y-%m-%d")  # Convert datetime to string for grouping
+                amount = float(t.get("amount", 0))
+                spending_trends[date_str] = spending_trends.get(date_str, 0) + amount
 
-    # Group expenses by category
-    expenses_by_category = {}
-    for t in transactions:
-        if t.get("type") == "expense":
-            category = t.get("category", "Uncategorized")
-            expenses_by_category[category] = expenses_by_category.get(category, 0) + float(t["amount"])
+        # Sort spending trends by date
+        spending_trends = sorted(spending_trends.items())  # Returns a list of (date, amount) tuples
 
-    # Prepare data for spending trends (group by date)
-    spending_trends = {}
-    for t in transactions:
-        if t.get("date"):
-            date_str = t["date"].strftime("%Y-%m-%d")
-            amount = float(t["amount"])
-            spending_trends[date_str] = spending_trends.get(date_str, 0) + amount
+        # Convert data for Chart.js
+        category_labels = list(expenses_by_category.keys())
+        category_values = list(expenses_by_category.values())
+        trend_dates = [date for date, _ in spending_trends]
+        trend_amounts = [amount for _, amount in spending_trends]
 
-    # Sort spending trends by date
-    spending_trends = sorted(spending_trends.items())
+        # Pass data to the analytics HTML template
+        return render_template(
+            'analytics.html',
+            total_income=total_income,
+            total_expenses=total_expenses,
+            savings=savings,
+            category_labels=json.dumps(category_labels),
+            category_values=json.dumps(category_values),
+            trend_dates=json.dumps(trend_dates),
+            trend_amounts=json.dumps(trend_amounts)
+        )
+    except Exception as e:
+        # Handle unexpected errors gracefully
+        flash(f"Error loading analytics data: {str(e)}", "error")
+        return redirect(url_for('home'))  # Redirect to a safe page if an error occurs
 
-    # Convert data for Chart.js
-    category_labels = list(expenses_by_category.keys())
-    category_values = list(expenses_by_category.values())
-    trend_dates = [date for date, _ in spending_trends]
-    trend_amounts = [amount for _, amount in spending_trends]
-
-    # Pass data to the analytics HTML template
-    return render_template(
-        'analytics.html',
-        total_income=total_income,
-        total_expenses=total_expenses,
-        savings=savings,
-        category_labels=json.dumps(category_labels or []),
-        category_values=json.dumps(category_values or []),
-        trend_dates=json.dumps(trend_dates or []),
-        trend_amounts=json.dumps(trend_amounts or [])
-    )
 
 #route for register page
 @app.route('/register', methods=['GET', 'POST'])
