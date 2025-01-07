@@ -10,6 +10,7 @@ import bcrypt
 from bson.objectid import ObjectId  # For working with MongoDB ObjectId
 from flask_cors import CORS 
 from datetime import datetime, timedelta
+from functools import wraps
 
 #creating the flask app
 app = Flask(__name__)
@@ -52,19 +53,28 @@ def index():
 def addtransaction():
     if request.method == 'POST':
         try:
-            
-            #extract the data from the form
+            # Ensure the user_id is in the session
+            user_id = session.get('user_id')
+            if not user_id:
+                flash('Error: User not logged in', 'error')
+                return redirect('/login')  # Redirect to login if not logged in
+
+            # Convert user_id from string to ObjectId
+            user_id = ObjectId(user_id)
+
+            # Extract data from the form
             date = datetime.strptime(request.form['transaction-date'], '%Y-%m-%d')
             type_ = request.form['transaction-type']
             category = request.form['transaction-category']
             amount = float(request.form['transaction-amount'])
 
-            # Insert into MongoDB
+            # Insert transaction into MongoDB
             transaction = {
                 "date": date,
                 "type": type_,
                 "category": category,
-                "amount": amount
+                "amount": amount,
+                "user_id": user_id  # Store user_id as ObjectId
             }
             transactions_collection.insert_one(transaction)
 
@@ -77,6 +87,7 @@ def addtransaction():
 
     return render_template('addtransaction.html')
 
+
 # Route for view transaction page
 @app.route('/viewtransaction', methods=['GET', 'POST'])
 def viewtransaction():
@@ -87,24 +98,6 @@ def viewtransaction():
 
             if not transaction_id or not action:
                 return jsonify({"message": "Missing action or transaction ID"}), 400
-
-            if action == 'delete':
-                transactions_collection.delete_one({"_id": ObjectId(transaction_id)})
-                return jsonify({"message": "Transaction deleted successfully"}), 200
-
-            elif action == 'edit':
-                updated_data = request.json.get('updatedData', {})
-                if not updated_data:
-                    return jsonify({"message": "No update data provided"}), 400
-
-                # Update the transaction in the database
-                transactions_collection.update_one(
-                    {"_id": ObjectId(transaction_id)},
-                    {"$set": updated_data}
-                )
-                return jsonify({"message": "Transaction updated successfully"}), 200
-
-            return jsonify({"message": "Invalid action"}), 400
 
         # GET request: Fetch transactions
         transactions = list(transactions_collection.find())
@@ -125,6 +118,8 @@ def viewtransaction():
         flash(f"Error loading transactions: {str(e)}", "error")
         return redirect(url_for('home'))
 
+
+#delete a transaction
 @app.route('/delete-transaction/<transaction_id>', methods=['DELETE'])
 def delete_transaction(transaction_id):
     try:
@@ -259,6 +254,37 @@ def analytics():
         # Handle unexpected errors gracefully
         flash(f"Error loading analytics data: {str(e)}", "error")
         return redirect(url_for('home'))  # Redirect to a safe page if an error occurs
+    
+#Add the New Filtering Route
+@app.route('/filter-user-data', methods=['GET'])
+def filter_user_data():
+    try:
+        # Get the logged-in user's ID from the session
+        user_id = session.get('user_id')  # User ID stored as string
+
+        if not user_id:
+            return jsonify({"success": False, "message": "Unauthorized access"}), 401
+
+        # Debugging: Print the user_id for verification
+        print(f"Filtering data for user_id: {user_id}")
+
+        # Fetch data for the logged-in user only
+        transactions = list(transactions_collection.find())
+
+        # Debugging: Log fetched transactions
+        print(f"Fetched Transactions: {transactions}")
+
+        # Format transactions for JSON response
+        for transaction in transactions:
+            transaction["_id"] = str(transaction["_id"])  # Convert ObjectId to string
+            if "date" in transaction and isinstance(transaction["date"], datetime):
+                transaction["date"] = transaction["date"].strftime("%Y-%m-%d")
+
+        return jsonify({"success": True, "data": transactions}), 200
+
+    except Exception as e:
+        return jsonify({"success": False, "message": f"Error: {str(e)}"}), 500
+
 
 
 #route for register page
@@ -346,6 +372,8 @@ def login():
 #route for logout 
 @app.route('/logout')
 def logout():
+    session.clear()  # Clear all session data
+    flash('You have been logged out.', 'success')
     return redirect(url_for('login'))
 
 #route for forgort password page

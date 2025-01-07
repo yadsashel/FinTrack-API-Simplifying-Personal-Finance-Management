@@ -1480,6 +1480,7 @@ td {
 .sec_ter_terms_tesec {
   margin-bottom: 1.5rem;
   border-left: 4px solid #61f312;
+  border-radius: 20px;
   padding-left: 1rem;
   padding-right: 1rem;
   animation: fadeIn 0.8s ease-in-out;

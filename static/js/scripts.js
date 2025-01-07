@@ -367,3 +367,16 @@ document.addEventListener("DOMContentLoaded", () => {
     new Chart(categoryChartCanvas, categoryChartConfig);
     new Chart(trendsChartCanvas, trendsChartConfig);
   });  
+
+//Add the New Filtering Route
+  fetch('/filter-user-data')
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log("Filtered Data:", data.data);
+            // Use the data for your table or analytics calculations
+        } else {
+            alert(data.message || "Failed to load data");
+        }
+    })
+    .catch(error => console.error("Error fetching user data:", error));
