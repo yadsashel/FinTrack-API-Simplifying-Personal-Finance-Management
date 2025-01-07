@@ -202,12 +202,31 @@ def profile():
     # Render the profile page with user data
     return render_template('profile.html', user=user)
 
-#route for analytics page
 @app.route('/analytics', methods=['GET'])
 def analytics():
     try:
-        # Fetch all transactions
-        transactions = list(transactions_collection.find({}))
+        # Get the logged-in user's ID from the session
+        user_id = session.get('user_id')
+        if not user_id:
+            flash("Error: User not logged in", "error")
+            return redirect('/login')  # Redirect to login if not logged in
+
+        # Convert user_id from string to ObjectId if necessary
+        try:
+            user_id = ObjectId(user_id)
+        except Exception as e:
+            print(f"Error converting user_id to ObjectId: {e}")
+            flash("Invalid user ID", "error")
+            return redirect('/login')
+
+        # Debugging: Print the user_id being used for filtering
+        print(f"Fetching transactions for user_id: {user_id}")
+
+        # Fetch transactions for the logged-in user
+        transactions = list(transactions_collection.find({"user_id": user_id}))
+
+        # Debugging: Print fetched transactions
+        print(f"Fetched transactions for user {user_id}: {transactions}")
 
         # Ensure all transaction dates are datetime objects
         for t in transactions:
@@ -264,7 +283,6 @@ def analytics():
         # Handle unexpected errors gracefully
         flash(f"Error loading analytics data: {str(e)}", "error")
         return redirect(url_for('home'))  # Redirect to a safe page if an error occurs
-
 
 #route for register page
 @app.route('/register', methods=['GET', 'POST'])
