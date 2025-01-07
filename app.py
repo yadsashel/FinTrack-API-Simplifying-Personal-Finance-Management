@@ -89,20 +89,29 @@ def addtransaction():
 
 
 # Route for view transaction page
-@app.route('/viewtransaction', methods=['GET', 'POST'])
+@app.route('/viewtransaction', methods=['GET'])
 def viewtransaction():
     try:
-        if request.method == 'POST':
-            action = request.json.get('action')
-            transaction_id = request.json.get('id')
+        user_id = session.get('user_id')  # Get the logged-in user's ID from the session
+        if not user_id:
+            flash("Error: User not logged in", "error")
+            return redirect('/login')  # Redirect to login if not logged in
 
-            if not transaction_id or not action:
-                return jsonify({"message": "Missing action or transaction ID"}), 400
+        # Convert user_id from string to ObjectId (if necessary)
+        user_id = ObjectId(user_id) if ObjectId.is_valid(user_id) else user_id
 
-        # GET request: Fetch transactions
-        transactions = list(transactions_collection.find())
+        # Fetch transactions for the logged-in user
+        transactions = list(transactions_collection.find({"user_id": user_id}))
+        if not transactions:
+            print(f"No transactions found for user ID: {user_id}")
+
+        # Debugging: Print transactions to console
         for transaction in transactions:
-            transaction["_id"] = str(transaction["_id"])  # Convert ObjectId to string for JSON serialization
+            print(transaction)
+
+        # Convert ObjectId to string for JSON serialization and fix dates
+        for transaction in transactions:
+            transaction["_id"] = str(transaction["_id"])  # Convert ObjectId to string
             if "date" in transaction:
                 if isinstance(transaction["date"], str):
                     try:
@@ -116,6 +125,7 @@ def viewtransaction():
 
     except Exception as e:
         flash(f"Error loading transactions: {str(e)}", "error")
+        print(f"Error: {str(e)}")
         return redirect(url_for('home'))
 
 
@@ -254,37 +264,6 @@ def analytics():
         # Handle unexpected errors gracefully
         flash(f"Error loading analytics data: {str(e)}", "error")
         return redirect(url_for('home'))  # Redirect to a safe page if an error occurs
-    
-#Add the New Filtering Route
-@app.route('/filter-user-data', methods=['GET'])
-def filter_user_data():
-    try:
-        # Get the logged-in user's ID from the session
-        user_id = session.get('user_id')  # User ID stored as string
-
-        if not user_id:
-            return jsonify({"success": False, "message": "Unauthorized access"}), 401
-
-        # Debugging: Print the user_id for verification
-        print(f"Filtering data for user_id: {user_id}")
-
-        # Fetch data for the logged-in user only
-        transactions = list(transactions_collection.find())
-
-        # Debugging: Log fetched transactions
-        print(f"Fetched Transactions: {transactions}")
-
-        # Format transactions for JSON response
-        for transaction in transactions:
-            transaction["_id"] = str(transaction["_id"])  # Convert ObjectId to string
-            if "date" in transaction and isinstance(transaction["date"], datetime):
-                transaction["date"] = transaction["date"].strftime("%Y-%m-%d")
-
-        return jsonify({"success": True, "data": transactions}), 200
-
-    except Exception as e:
-        return jsonify({"success": False, "message": f"Error: {str(e)}"}), 500
-
 
 
 #route for register page
