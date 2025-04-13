@@ -91,9 +91,9 @@ This project is licensed under the **MIT License**.
 
 For questions, suggestions, or issues, feel free to reach out:
 
-- **Name**: [Your Name]
-- **Email**: [Your Email]
-- **GitHub**: [Your GitHub Username]
+- **Name**: Yazide Salhi
+- **Email**: yadsashel@gmail.com
+- **GitHub**: yadsashel
 
 ---
 
